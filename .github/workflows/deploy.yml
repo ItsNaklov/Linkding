@@ -2,9 +2,8 @@ name: Deploy Linkding
 
 on:
   push:
-     branches:
+    branches:
       - main
-
 
 jobs:
   deploy:
@@ -13,21 +12,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-
 
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
 
-
-      - name: Terraform plan
+      - name: Terraform Plan
         run: terraform plan
         working-directory: terraform
 
-
-      - name: Terraform apply
-        run: terraform apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
         working-directory: terraform
