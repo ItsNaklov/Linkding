@@ -12,6 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Run Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: sissbruecker/linkding:latest
+          format: table
+          exit-code: 1
+          severity: CRITICAL
+
       - name: Connect to Tailscale
         uses: tailscale/github-action@v2
         with:
